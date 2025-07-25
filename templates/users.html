@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users - ParkSmart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --mustard: #B8860B;
+            --dark-mustard: #8B6914;
+            --blue-accent: #4A90E2;
+            --dark-blue: #2C5AA0;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: #333;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #7d5c00 !important;
+            font-size: 1.8rem;
+        }
+        .navbar-nav .nav-link {
+            color: #7d5c00 !important;
+            font-weight: 500;
+            margin: 0 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #1E90FF !important;
+            transform: translateY(-2px);
+        }
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background: #1E90FF;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        .navbar-nav .nav-link:hover::after {
+            width: 100%;
+        }
+        .book-parking-btn {
+            background: linear-gradient(135deg, var(--blue-accent), var(--dark-blue));
+            color: white !important;
+            padding: 10px 25px !important;
+            border-radius: 50px;
+            font-weight: bold;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+        }
+        .book-parking-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
+            color: white !important;
+        }
+        .dashboard-container {
+            margin-top: 100px;
+            padding: 20px;
+        }
+        .users-table {
+            background: linear-gradient(135deg, rgba(184, 134, 11, 0.9), rgba(74, 144, 226, 0.8), rgba(139, 105, 20, 0.9));
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            color: white;
+        }
+        .users-table:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .users-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .users-table th, .users-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .users-table th {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+        }
+        .users-table td {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}"><i class="fas fa-car"></i> ParkSmart</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('users') }}">
+                            <i class="fas fa-users"></i> Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('search') }}">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('summary') }}">
+                            <i class="fas fa-chart-bar"></i> Summary
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link book-parking-btn" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Users Section -->
+    <div class="dashboard-container container">
+        <h2 class="text-dark">Registered Users</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <div class="users-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.fullname }}</td>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer style="
+        background: linear-gradient(135deg, 
+            rgba(184, 134, 11, 0.9), 
+            rgba(74, 144, 226, 0.8),
+            rgba(139, 105, 20, 0.9)
+        );
+        padding: 40px 0;
+        color: white;
+    ">
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: left; max-width: 1200px; margin: auto;">
+            <div>
+                <h3 style="color: #fff;">Quick Links</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li><a href="{{ url_for('index') }}" style="color: white; text-decoration: none;">Home</a></li>
+                    <li><a href="{{ url_for('services') }}" style="color: white; text-decoration: none;">Services</a></li>
+                    <li><a href="{{ url_for('book') }}" style="color: white; text-decoration: none;">Book Parking</a></li>
+                    <li><a href="{{ url_for('contact') }}" style="color: white; text-decoration: none;">Contact Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color: #fff;">Contact</h3>
+                <p><i class="fas fa-map-marker-alt" style="color: #ffd700;"></i> 45th Street, Metro City</p>
+                <p><i class="fas fa-phone" style="color: #ffd700;"></i> (123) 456-7890</p>
+                <p><i class="fas fa-envelope" style="color: #ffd700;"></i> info@parksmart.com</p>
+            </div>
+            <div>
+                <h3 style="color: #fff;">Follow Us</h3>
+                <a href="#" style="margin-right: 15px; color: white;"><i class="fab fa-facebook fa-lg"></i></a>
+                <a href="#" style="margin-right: 15px; color: white;"><i class="fab fa-twitter fa-lg"></i></a>
+                <a href="#" style="color: white;"><i class="fab fa-instagram fa-lg"></i></a>
+            </div>
+            <div>
+                <h3 style="color: #fff;">Payment Methods</h3>
+                <i class="fab fa-cc-visa fa-2x" style="color: white; margin-right: 10px;"></i>
+                <i class="fab fa-cc-mastercard fa-2x" style="color: white; margin-right: 10px;"></i>
+                <i class="fab fa-cc-paypal fa-2x" style="color: white;"></i>
+            </div>
+        </div>
+        <hr style="margin: 30px auto; width: 80%; border-color: rgba(255, 215, 0, 0.4);" />
+        <p style="text-align: center; color: #fff;">© 2025 ParkSmart. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

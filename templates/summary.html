@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkSmart - Park Stats</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --mustard: #B8860B;
+            --dark-mustard: #8B6914;
+            --blue-accent: #4A90E2;
+            --dark-blue: #2C5AA0;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #7d5c00 !important;
+            font-size: 1.8rem;
+        }
+        .navbar-nav .nav-link {
+            color: #7d5c00 !important;
+            font-weight: 500;
+            margin: 0 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #1E90FF !important;
+            transform: translateY(-2px);
+        }
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background: #1E90FF;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        .navbar-nav .nav-link:hover::after {
+            width: 100%;
+        }
+        .book-parking-btn {
+            background: linear-gradient(135deg, var(--blue-accent), var(--dark-blue));
+            color: white !important;
+            padding: 10px 25px !important;
+            border-radius: 50px;
+            font-weight: bold;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+        }
+        .book-parking-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
+            color: white !important;
+        }
+        .summary-section {
+            padding: 20px;
+            text-align: center;
+            margin-top: 80px;
+        }
+        .summary-section h1 {
+            color: #8B4513;
+        }
+        .charts-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .chart-box {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 45%;
+            min-width: 300px;
+        }
+        .error-message {
+            color: #dc3545;
+            font-weight: bold;
+            display: none;
+            margin-top: 10px;
+        }
+        .vehicle-types-summary {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        footer {
+            background: linear-gradient(135deg, rgba(184, 134, 11, 0.9), rgba(74, 144, 226, 0.8), rgba(139, 105, 20, 0.9));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        footer a {
+            color: white;
+            text-decoration: none;
+        }
+        footer .section {
+            margin: 10px;
+        }
+        footer .section h3 {
+            margin-bottom: 10px;
+        }
+        footer .social-icons i, footer .payment-methods i {
+            font-size: 30px;
+            margin: 0 5px;
+            color: white;
+        }
+        footer .copyright {
+            text-align: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="{{ url_for('dashboard') }}"><i class="fas fa-car"></i> ParkSmart</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                                <i class="fas fa-home"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('users') }}">
+                                <i class="fas fa-users"></i> Users
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('search') }}">
+                                <i class="fas fa-search"></i> Search
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('summary') }}">
+                                <i class="fas fa-chart-bar"></i> Summary
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link book-parking-btn" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="summary-section">
+        <h1>Summary - Parking Statistics</h1>
+        <div class="charts-container">
+            <div class="chart-box">
+                <canvas id="revenueChart"></canvas>
+                <p id="revenueError" class="error-message"></p>
+            </div>
+            <div class="chart-box">
+                <canvas id="availabilityChart"></canvas>
+                <p id="availabilityError" class="error-message"></p>
+            </div>
+            <div class="chart-box">
+                <canvas id="peakHoursChart"></canvas>
+                <p id="peakHoursError" class="error-message"></p>
+            </div>
+            <div class="chart-box">
+                <canvas id="vehicleTypesChart"></canvas>
+                <p id="vehicleTypesError" class="error-message"></p>
+                <p id="vehicleTypesSummary" class="vehicle-types-summary"></p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="section">
+            <h3>Quick Links</h3>
+            <a href="{{ url_for('index') }}">Home</a><br>
+            <a href="{{ url_for('services') }}">Services</a><br>
+            <a href="{{ url_for('book') }}">Book Parking</a><br>
+            <a href="{{ url_for('contact') }}">Contact Us</a>
+        </div>
+        <div class="section">
+            <h3>Contact</h3>
+            <p>📍 45th Street, Metro City</p>
+            <p>📞 (123) 456-7890</p>
+            <p>📧 info@parksmart.com</p>
+        </div>
+        <div class="section">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <div class="section">
+            <h3>Payment Methods</h3>
+            <div class="payment-methods">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-cc-paypal"></i>
+            </div>
+        </div>
+        <div class="copyright">
+            © 2025 ParkSmart. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Fallback data for empty or failed API responses
+        const fallbackData = {
+            availability: {
+                labels: ["Available", "Occupied"],
+                data: [0, 0],
+                backgroundColor: ["#90EE90", "#1E90FF"]
+            },
+            revenue: {
+                labels: ["No Data"],
+                data: [0],
+                backgroundColor: ["#FF6F61"]
+            },
+            peakHours: {
+                labels: ["12 AM", "4 AM", "8 AM", "12 PM", "4 PM", "8 PM"],
+                data: [0, 0, 0, 0, 0, 0],
+                backgroundColor: "#1E90FF"
+            },
+            vehicleTypes: {
+                labels: ["No Data"],
+                data: [0],
+                backgroundColor: ["#FF6F61"]
+            }
+        };
+
+        // Function to initialize a single chart
+        function initChart(canvasId, type, data, title, errorElementId, summaryElementId = null) {
+            try {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                const isVehicleTypes = canvasId === 'vehicleTypesChart';
+                const chart = new Chart(ctx, {
+                    type: type,
+                    data: {
+                        labels: isVehicleTypes ? data.labels.map((label, i) => `${label} (${data.data[i]})`) : data.labels,
+                        datasets: [{
+                            label: title.includes('Revenue') ? 'Revenue ($)' : 
+                                   title.includes('Availability') ? 'Parking Slots' : 
+                                   title.includes('Vehicle') ? 'Bookings' : 'Vehicles',
+                            data: data.data,
+                            backgroundColor: data.backgroundColor,
+                            borderColor: type === 'bar' ? '#333' : data.backgroundColor,
+                            borderWidth: type === 'bar' ? 1 : 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { 
+                                position: 'top',
+                                labels: { font: { size: 12 } }
+                            },
+                            title: { 
+                                display: true, 
+                                text: title,
+                                font: { size: 16 }
+                            },
+                            tooltip: {
+                                enabled: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label.split(' (')[0];
+                                        const value = context.raw;
+                                        return `${label}: ${value} booking${value !== 1 ? 's' : ''}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: type === 'bar' ? { 
+                            y: { 
+                                beginAtZero: true,
+                                title: { display: true, text: isVehicleTypes ? 'Number of Bookings' : 'Count' }
+                            },
+                            x: { title: { display: true, text: isVehicleTypes ? 'Vehicle Type' : '' } }
+                        } : {}
+                    }
+                });
+
+                // Update summary text for vehicle types
+                if (isVehicleTypes && summaryElementId && data.labels[0] !== 'No Data') {
+                    const summary = data.labels.map((label, i) => {
+                        const type = label.split(' (')[0];
+                        return `${type}: ${data.data[i]} booking${data.data[i] !== 1 ? 's' : ''}`;
+                    }).join(', ');
+                    document.getElementById(summaryElementId).textContent = summary;
+                } else if (isVehicleTypes && summaryElementId) {
+                    document.getElementById(summaryElementId).textContent = 'No active vehicle bookings.';
+                }
+
+                return chart;
+            } catch (error) {
+                console.error(`Error initializing ${canvasId} chart:`, error);
+                document.getElementById(errorElementId).textContent = `Failed to load ${title.toLowerCase()}: ${error.message}`;
+                document.getElementById(errorElementId).style.display = 'block';
+                return null;
+            }
+        }
+
+        // Function to fetch data and initialize charts
+        async function initCharts() {
+            // Clear previous error messages and summaries
+            ['availabilityError', 'revenueError', 'peakHoursError', 'vehicleTypesError'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+                document.getElementById(id).textContent = '';
+            });
+            document.getElementById('vehicleTypesSummary').textContent = '';
+
+            try {
+                // Fetch Availability Data
+                let availabilityData = fallbackData.availability;
+                try {
+                    const availabilityResponse = await fetch('/api/stats/availability', { credentials: 'include' });
+                    if (!availabilityResponse.ok) {
+                        throw new Error(`HTTP ${availabilityResponse.status}: ${availabilityResponse.statusText}`);
+                    }
+                    const data = await availabilityResponse.json();
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    availabilityData = data;
+                } catch (error) {
+                    console.error('Availability fetch error:', error);
+                    document.getElementById('availabilityError').textContent = `Failed to load availability: ${error.message}`;
+                    document.getElementById('availabilityError').style.display = 'block';
+                    if (error.message.includes('Unauthorized')) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                }
+                initChart('availabilityChart', 'bar', availabilityData, 'Available vs Occupied Parking Slots', 'availabilityError');
+
+                // Fetch Revenue Data
+                let revenueData = fallbackData.revenue;
+                try {
+                    const revenueResponse = await fetch('/api/stats/revenue', { credentials: 'include' });
+                    if (!revenueResponse.ok) {
+                        throw new Error(`HTTP ${revenueResponse.status}: ${revenueResponse.statusText}`);
+                    }
+                    const data = await revenueResponse.json();
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    revenueData = data.labels.length ? data : fallbackData.revenue;
+                } catch (error) {
+                    console.error('Revenue fetch error:', error);
+                    document.getElementById('revenueError').textContent = `Failed to load revenue: ${error.message}`;
+                    document.getElementById('revenueError').style.display = 'block';
+                    if (error.message.includes('Unauthorized')) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                }
+                initChart('revenueChart', 'doughnut', revenueData, 'Revenue from Each Parking Lot', 'revenueError');
+
+                // Fetch Peak Hours Data
+                let peakHoursData = fallbackData.peakHours;
+                try {
+                    const peakHoursResponse = await fetch('/api/stats/peak_hours', { credentials: 'include' });
+                    if (!peakHoursResponse.ok) {
+                        throw new Error(`HTTP ${peakHoursResponse.status}: ${peakHoursResponse.statusText}`);
+                    }
+                    const data = await peakHoursResponse.json();
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    peakHoursData = data;
+                } catch (error) {
+                    console.error('Peak hours fetch error:', error);
+                    document.getElementById('peakHoursError').textContent = `Failed to load peak hours: ${error.message}`;
+                    document.getElementById('peakHoursError').style.display = 'block';
+                    if (error.message.includes('Unauthorized')) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                }
+                initChart('peakHoursChart', 'bar', peakHoursData, 'Peak Parking Hours', 'peakHoursError');
+
+                // Fetch Vehicle Types Data
+                let vehicleTypesData = fallbackData.vehicleTypes;
+                try {
+                    const vehicleTypesResponse = await fetch('/api/stats/vehicle_types', { credentials: 'include' });
+                    if (!vehicleTypesResponse.ok) {
+                        throw new Error(`HTTP ${vehicleTypesResponse.status}: ${vehicleTypesResponse.statusText}`);
+                    }
+                    const data = await vehicleTypesResponse.json();
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    vehicleTypesData = data.labels.length ? data : fallbackData.vehicleTypes;
+                } catch (error) {
+                    console.error('Vehicle types fetch error:', error);
+                    document.getElementById('vehicleTypesError').textContent = `Failed to load vehicle types: ${error.message}`;
+                    document.getElementById('vehicleTypesError').style.display = 'block';
+                    if (error.message.includes('Unauthorized')) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                }
+                initChart('vehicleTypesChart', 'pie', vehicleTypesData, 'Vehicle Type Distribution', 'vehicleTypesError', 'vehicleTypesSummary');
+
+            } catch (error) {
+                console.error('General initCharts error:', error);
+            }
+        }
+
+        // Initialize charts on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof Chart !== 'undefined') {
+                initCharts();
+            } else {
+                console.error('Chart.js not loaded');
+                ['availabilityError', 'revenueError', 'peakHoursError', 'vehicleTypesError'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.textContent = 'Chart.js failed to load';
+                    el.style.display = 'block';
+                });
+                document.getElementById('vehicleTypesSummary').textContent = 'Chart.js failed to load';
+            }
+        });
+    </script>
+</body>
+</html>

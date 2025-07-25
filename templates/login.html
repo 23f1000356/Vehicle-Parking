@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ParkSmart - Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --mustard: #B8860B;
+      --dark-mustard: #8B6914;
+      --light-mustard: #DAA520;
+      --blue-accent: #4A90E2;
+      --dark-blue: #2C5AA0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      background: linear-gradient(135deg, 
+        rgba(184, 134, 11, 0.9), 
+        rgba(74, 144, 226, 0.8),
+        rgba(139, 105, 20, 0.9)
+      );
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+      padding: 15px 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 999;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      color: var(--dark-mustard) !important;
+      font-size: 1.8rem;
+    }
+
+    .login-container {
+      background: #ffffff;
+      border: 1px solid rgba(184, 134, 11, 0.2);
+      padding: 3rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 450px;
+      max-width: 90vw;
+      position: relative;
+      z-index: 10;
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .logo {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--dark-mustard);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .logo i {
+      color: var(--blue-accent);
+      font-size: 2rem;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 0.9rem;
+      font-weight: 300;
+    }
+
+    .form-section {
+      width: 100%;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--dark-mustard);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .input-container {
+      position: relative;
+    }
+
+    .input-container i {
+      position: absolute;
+      left: 15px;
+      top: 15px;
+      color: var(--blue-accent);
+      font-size: 1.1rem;
+      z-index: 2;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      border: 2px solid rgba(184, 134, 11, 0.3);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #333;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    input::placeholder {
+      color: #666;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--blue-accent);
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 20px rgba(74, 144, 226, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--light-mustard), var(--dark-mustard));
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(184, 134, 11, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .signup-link {
+      text-align: center;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(184, 134, 11, 0.2);
+    }
+
+    .signup-link a {
+      color: var(--blue-accent);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .signup-link a:hover {
+      color: var(--dark-blue);
+      transform: translateY(-2px);
+    }
+
+    .flash-message {
+      width: 100%;
+      padding: 12px 16px;
+      margin-bottom: 1.5rem;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 500;
+      animation: slideInDown 0.5s ease-out;
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .flash-message.success {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #86efac;
+    }
+
+    .flash-message.danger {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+
+    .role-switch {
+      display: flex;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 1.5rem;
+    }
+
+    .role-option {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      color: var(--dark-mustard);
+    }
+
+    .role-option.active {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--blue-accent);
+    }
+
+    .role-option:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        width: 90%;
+        padding: 2rem;
+        margin: 1rem;
+      }
+
+      .logo {
+        font-size: 2rem;
+      }
+
+      input {
+        padding: 12px 12px 12px 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('index') }}"><i class="fas fa-car"></i> ParkSmart</a>
+    </div>
+  </nav>
+
+  <div class="login-container">
+    <div class="logo-section">
+      <div class="logo">
+        <i class="fas fa-parking"></i>
+        ParkSmart
+      </div>
+      <div class="subtitle">Welcome back! Please sign in to your account</div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">
+            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' }}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('login') }}" class="form-section">
+      <div class="role-switch">
+        <div class="role-option active" data-role="user">
+          <i class="fas fa-user"></i> User
+        </div>
+        <div class="role-option" data-role="admin">
+          <i class="fas fa-user-shield"></i> Admin
+        </div>
+      </div>
+      
+      <input type="hidden" id="role" name="role" value="user">
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-container">
+          <i class="fas fa-envelope"></i>
+          <input 
+            type="email" 
+            id="email" 
+            name="username" 
+            placeholder="Enter your email address"
+            required 
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-container">
+          <i class="fas fa-lock"></i>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            placeholder="Enter your password"
+            required 
+          />
+        </div>
+      </div>
+
+      <button type="submit" class="login-btn">
+        <i class="fas fa-sign-in-alt"></i>
+        Sign In
+      </button>
+
+      <div class="signup-link" id="signupLink">
+        <a href="{{ url_for('signup') }}">
+          <i class="fas fa-user-plus"></i>
+          Don't have an account? Create one
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Role switching functionality
+    const roleOptions = document.querySelectorAll('.role-option');
+    const roleInput = document.getElementById('role');
+    const signupLink = document.getElementById('signupLink');
+
+    roleOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        roleOptions.forEach(opt => opt.classList.remove('active'));
+        option.classList.add('active');
+        roleInput.value = option.dataset.role;
+        if (option.dataset.role === 'admin') {
+          signupLink.style.display = 'none';
+        } else {
+          signupLink.style.display = 'block';
+        }
+      });
+    });
+
+    // Password visibility toggle
+    const passwordInput = document.getElementById('password');
+    const passwordContainer = passwordInput.closest('.input-container');
+    const eyeIcon = document.createElement('i');
+    eyeIcon.className = 'fas fa-eye-slash';
+    eyeIcon.style.cssText = `
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      cursor: pointer;
+      color: var(--blue-accent);
+      z-index: 3;
+    `;
+    eyeIcon.addEventListener('click', () => {
+      passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+      eyeIcon.className = passwordInput.type === 'password' ? 'fas fa-eye-slash' : 'fas fa-eye';
+    });
+    passwordContainer.appendChild(eyeIcon);
+  </script>
+</body>
+</html>

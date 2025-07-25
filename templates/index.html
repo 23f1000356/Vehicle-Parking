@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureParking - Smart Vehicle Parking Solutions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --mustard: #B8860B;
+            --dark-mustard: #8B6914;
+            --light-mustard: #DAA520;
+            --blue-accent: #4A90E2;
+            --dark-blue: #2C5AA0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--dark-mustard) !important;
+            font-size: 1.8rem;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--dark-mustard) !important;
+            font-weight: 500;
+            margin: 0 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--blue-accent) !important;
+            transform: translateY(-2px);
+        }
+
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background: var(--blue-accent);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .navbar-nav .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .book-parking-btn {
+            background: linear-gradient(135deg, var(--blue-accent), var(--dark-blue));
+            color: white !important;
+            padding: 10px 25px !important;
+            border-radius: 50px;
+            font-weight: bold;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .book-parking-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
+            color: white !important;
+        }
+
+        /* Hero Section with Parallax */
+        .hero-section {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            background: linear-gradient(135deg, 
+                rgba(184, 134, 11, 0.9), 
+                rgba(74, 144, 226, 0.8),
+                rgba(139, 105, 20, 0.9)
+            ),
+            url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><pattern id="parking" patternUnits="userSpaceOnUse" width="100" height="60"><rect width="90" height="50" fill="%23f8f9fa" stroke="%23dee2e6" stroke-width="2" rx="5"/><circle cx="20" cy="25" r="8" fill="%23B8860B"/><circle cx="45" cy="25" r="8" fill="%234A90E2"/><circle cx="70" cy="25" r="8" fill="%23B8860B"/></pattern></defs><rect width="100%" height="100%" fill="url(%23parking)" opacity="0.1"/></svg>');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            animation: parallaxMove 20s ease-in-out infinite;
+        }
+
+        @keyframes parallaxMove {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        .hero-content {
+            text-align: center;
+            color: white;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cta-buttons {
+            animation: fadeInUp 1s ease-out 0.9s both;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--light-mustard), var(--dark-mustard));
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(184, 134, 11, 0.3);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(184, 134, 11, 0.4);
+            background: linear-gradient(135deg, var(--dark-mustard), var(--mustard));
+        }
+
+        .btn-outline-custom {
+            border: 3px solid white;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            margin: 10px;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-custom:hover {
+            background: white;
+            color: var(--dark-mustard);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Floating Elements */
+        .floating-card {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-card-1 {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-card-3 {
+            bottom: 30%;
+            left: 15%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(1deg); }
+            50% { transform: translateY(-15px) rotate(-1deg); }
+            75% { transform: translateY(-25px) rotate(0.5deg); }
+        }
+
+        .floating-card i {
+            font-size: 2rem;
+            color: var(--blue-accent);
+            margin-bottom: 10px;
+        }
+
+        .floating-card h5 {
+            color: var(--dark-mustard);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .floating-card p {
+            color: #666;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+.parallax-why {
+  background-image: url('static/images/pic4.jpg'); /* Replace with your actual image path */
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  color: white; /* Makes all text inside white */
+  padding: 60px 20px;
+}
+
+.parallax-why h2,
+.parallax-why p {
+  color: white !important; /* Override inline styles */
+}
+
+
+.parallax-why::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+   
+    z-index: 2;
+}
+
+.why-section .container {
+    position: relative;
+    z-index: 3;
+}
+
+        .why-section {
+    min-height: auto; /* Remove the 100vh height */
+    padding: 40px 0;   /* Reduce vertical padding */
+}
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .floating-card {
+                display: none;
+            }
+
+            .btn-primary-custom,
+            .btn-outline-custom {
+                padding: 12px 30px;
+                font-size: 1rem;
+                margin: 8px;
+            }
+        }
+        /* Hover effect for the card */
+section.py-5 .row .col-md-4 .p-4 {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+section.py-5 .row .col-md-4 .p-4:hover {
+  transform: translateY(-10px); /* Lifts the card slightly */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); /* Adds stronger shadow */
+  background-color: #f8f9fa; /* Optional: slight background color change */
+}
+
+   
+    .carousel-item img {
+        height: 400px; /* Adjust height as needed */
+        object-fit: cover;
+    }
+
+    @media (max-width: 768px) {
+        .carousel-item img {
+            height: 250px; /* Shorter height for smaller screens */
+        }
+    }
+        /* Additional Sections Placeholder */
+        .content-section {
+            min-height: 100vh;
+            padding: 100px 0;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+        }
+        .about-section {
+  background-color: #ffffff; /* White background */
+  color: #7d5c00; /* ParkSmart logo color */
+}
+
+.about-section .section-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #7d5c00; /* Same as logo color */
+}
+
+.about-section p,
+.about-section a {
+  color: #7d5c00;
+}
+.small-image {
+  max-width: 75%;
+  height: auto;
+}
+
+
+.about-section a.btn-outline-light {
+  border-color: #7d5c00;
+  color: #7d5c00;
+}
+
+.about-section a.btn-outline-light:hover {
+  background-color: #7d5c00;
+  color: #fff;
+}
+
+
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}"><i class="fas fa-car"></i> ParkSmart</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('signup') }}">
+                            <i class="fas fa-user-plus"></i> Sign Up
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                    </li>
+                                  <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('contact') }}">
+                            <i class="fas fa-envelope"></i> Contact
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link book-parking-btn" href="{{ url_for('book') }}">
+                            <i class="fas fa-calendar-check"></i> Book Parking
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="parallax-bg"></div>
+        
+        <!-- Floating Cards -->
+        <div class="floating-card floating-card-1">
+            <i class="fas fa-shield-alt"></i>
+            <h5>Secure</h5>
+            <p>24/7 monitored<br>parking spaces</p>
+        </div>
+        
+        <div class="floating-card floating-card-3">
+            <i class="fas fa-clock"></i>
+            <h5>Real-time</h5>
+            <p>Live availability<br>updates</p>
+        </div>
+        
+        <!-- Hero Content -->
+        <div class="hero-content">
+            <h1 class="hero-title">Smart Parking Solutions</h1>
+            <p class="hero-subtitle">Revolutionizing Urban Mobility</p>
+            <p class="hero-description">
+                Experience seamless parking with our innovative technology platform. 
+                Find, reserve, and pay for parking spaces instantly with real-time availability, 
+                secure transactions, and 24/7 customer support.
+            </p>
+            <div class="cta-buttons">
+                <button class="btn btn-primary-custom">
+                    <i class="fas fa-rocket"></i> Get Started
+                </button>
+                <button class="btn btn-outline-custom">
+                    <i class="fas fa-play-circle"></i> Watch Demo
+                </button>
+            </div>
+        </div>
+        
+        
+        <!-- Scroll Indicator -->
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down fa-2x"></i>
+        </div>
+    </section>
+
+<section id="why-choose" class="why-section parallax-why">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 style="color: var(--dark-mustard); margin-bottom: 30px;">
+                    <i class="fas fa-star"></i> Why Choose SecureParking?
+                </h2>
+                <p class="lead" style="color: #666;">
+                    Our comprehensive parking management system offers cutting-edge features 
+                    for both parking operators and users, ensuring efficient space utilization 
+                    and enhanced user experience.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold" style="color: #666;">WHY CHOOSE US?</h2>
+        <div class="row text-center g-4">
+            <div class="col-md-4">
+                <div class="p-4 bg-white shadow rounded">
+                    <div class="mb-3">
+                        <i class="fas fa-headset fa-3x text-primary"></i> <!-- Service Icon -->
+                    </div>
+                    <h5 class="fw-bold" style="color: #666;">Exceptional Support</h5>
+                    <p class="text-muted">Our team delivers unmatched assistance and guidance to ensure every parking experience is smooth, efficient, and stress-free.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-white shadow rounded">
+                    <div class="mb-3">
+                        <i class="fas fa-microchip fa-3x text-primary"></i> <!-- Tech Icon -->
+                    </div>
+                    <h5 class="fw-bold" style="color: #666;">Next-Gen Technology</h5>
+                    <p class="text-muted">We integrate cutting-edge tools like AI, IoT & real-time analytics to offer smart and secure parking solutions for urban needs.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-white shadow rounded">
+                    <div class="mb-3">
+                        <i class="fas fa-cogs fa-3x text-primary"></i> <!-- Solution Icon -->
+                    </div>
+                    <h5 class="fw-bold" style="color: #666;">Complete Parking Ecosystem</h5>
+                    <p class="text-muted">From entry to exit, we handle it all — offering end-to-end systems for booking, monitoring, payment, and security.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+  <!-- Carousel Section -->
+<section id="carousel" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4" style="color: var(--dark-mustard);">
+            <i class="fas fa-images"></i> Explore Our Parking Solutions
+        </h2>
+        <div id="parkingCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#parkingCarousel" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#parkingCarousel" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#parkingCarousel" data-bs-slide-to="2"></button>
+            </div>
+            <div class="carousel-inner rounded shadow">
+                <div class="carousel-item active">
+                    <img src="static/images/pic.jpg" class="d-block w-100" alt="Smart Parking Tech">
+                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
+                        <h5>Smart Tech Integration</h5>
+                        <p>Leverage IoT for real-time tracking & monitoring.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="static/images/pic2.jpg" class="d-block w-100" alt="Secure Parking">
+                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
+                        <h5>Secure & Safe</h5>
+                        <p>Monitored zones with 24/7 surveillance.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="static/images/pic3.jpg" class="d-block w-100" alt="Easy Reservations">
+                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
+                        <h5>Instant Reservations</h5>
+                        <p>Book your slot with a single click from anywhere.</p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#parkingCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#parkingCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+</section>
+<section id="about" class="about-section py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <!-- Image Section -->
+      <div class="col-md-6 mb-4 mb-md-0">
+        <img src="static/images/pic5.jpg" class="img-fluid rounded-4 shadow small-image" alt="About Parking App">
+
+      </div>
+
+      <!-- Text Content -->
+      <div class="col-md-6 text-white">
+        <h2 class="section-title mb-3">
+          <i class="fas fa-parking"></i> About ParkSmart
+        </h2>
+        <p class="lead">
+          ParkSmart is a next-gen smart parking platform built to solve urban congestion and parking chaos using technology and automation.
+        </p>
+        <p>
+          Designed for both <strong>users</strong> and <strong>admins</strong>, it enables real-time booking, availability tracking, and seamless parking management.
+          Admins can manage parking lots, monitor occupancy, and generate reports — all from a unified dashboard.
+        </p>
+        <p>
+          Whether you're a daily commuter or a parking operator, ParkSmart transforms your parking experience with AI-powered insights and intuitive design.
+        </p>
+        <a href="#services" class="btn btn-outline-light mt-3">Explore Features</a>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="find-parking py-5">
+  <div class="container text-center">
+    <div class="row justify-content-center align-items-center">
+      <!-- Text and Input -->
+      <div class="col-md-6">
+        <h2 class="mb-4" style="color: #7d5c00; font-weight: bold;">Where would you like to park?</h2>
+        <form action="{{ url_for('book') }}" method="get" class="d-flex flex-column align-items-center">
+          <input type="text" name="location" placeholder="Enter a city or location" class="form-control mb-3 shadow-sm w-75" required>
+          <button type="submit" class="btn-pill shadow">Find a Spot</button>
+        </form>
+      </div>
+
+      <!-- Image -->
+      <div class="col-md-4 mt-4 mt-md-0">
+        <img src="static/images/p1.png" alt="Modern Parking Sign" class="img-fluid rounded-3 shadow" style="max-width: 100%; height: auto;">
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<footer style="
+  background: linear-gradient(135deg, 
+    rgba(184, 134, 11, 0.9), 
+    rgba(74, 144, 226, 0.8),
+    rgba(139, 105, 20, 0.9)
+  );
+  padding: 40px 0;
+  color: white;
+">
+  <div style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: left; max-width: 1200px; margin: auto;">
+
+    <!-- Quick Links -->
+    <div>
+      <h3 style="color: #fff;">Quick Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li><a href="{{ url_for('index') }}" style="color: white; text-decoration: none;">Home</a></li>
+        <li><a href="{{ url_for('book') }}" style="color: white; text-decoration: none;">Book Parking</a></li>
+        <li><a href="{{ url_for('contact') }}" style="color: white; text-decoration: none;">Contact Us</a></li>
+      </ul>
+    </div>
+
+    <!-- Contact Info -->
+    <div>
+      <h3 style="color: #fff;">Contact</h3>
+      <p><i class="fas fa-map-marker-alt" style="color: #ffd700;"></i> 45th Street, Metro City</p>
+      <p><i class="fas fa-phone" style="color: #ffd700;"></i> (123) 456-7890</p>
+      <p><i class="fas fa-envelope" style="color: #ffd700;"></i> info@parksmart.com</p>
+    </div>
+
+    <!-- Social Media -->
+    <div>
+      <h3 style="color: #fff;">Follow Us</h3>
+      <a href="#" style="margin-right: 15px; color: white;"><i class="fab fa-facebook fa-lg"></i></a>
+      <a href="#" style="margin-right: 15px; color: white;"><i class="fab fa-twitter fa-lg"></i></a>
+      <a href="#" style="color: white;"><i class="fab fa-instagram fa-lg"></i></a>
+    </div>
+
+    <!-- Payment Methods -->
+    <div>
+      <h3 style="color: #fff;">Payment Methods</h3>
+      <i class="fab fa-cc-visa fa-2x" style="color: white; margin-right: 10px;"></i>
+      <i class="fab fa-cc-mastercard fa-2x" style="color: white; margin-right: 10px;"></i>
+      <i class="fab fa-cc-paypal fa-2x" style="color: white;"></i>
+    </div>
+
+  </div>
+
+  <hr style="margin: 30px auto; width: 80%; border-color: rgba(255, 215, 0, 0.4);" />
+
+  <p style="text-align: center; color: #fff;">© 2025 ParkSmart. All rights reserved.</p>
+</footer>
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript for Enhanced Interactions -->
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                navbar.style.boxShadow = '0 4px 30px rgba(0,0,0,0.15)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+            }
+        });
+
+        // Parallax effect enhancement
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.parallax-bg');
+            const speed = scrolled * 0.5;
+            parallax.style.transform = `translateY(${speed}px)`;
+        });
+
+        // Button click animations
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                let ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                this.appendChild(ripple);
+                
+                let x = e.clientX - e.target.offsetLeft;
+                let y = e.clientY - e.target.offsetTop;
+                
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+    </script>
+
+    <style>
+        /* Ripple effect for buttons */
+        .btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        .btn-custom {
+  background-color: #007BFF; /* Bootstrap blue */
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-custom:hover {
+  background-color: #0056b3;
+}
+
+.find-parking {
+  background: linear-gradient(to bottom, #f9f9f9, #ffffff);
+}
+
+.find-parking h2 {
+  font-weight: bold;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.find-parking input.form-control {
+  border: 2px solid #7d5c00;
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
+.find-parking input.form-control::placeholder {
+  color: #aaa;
+}
+.btn-pill {
+  background: linear-gradient(to right, #5a7fff, #4b6cff); /* Gradient blue */
+  color: white;
+  padding: 10px 25px;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  border-radius: 50px; /* Pill shape */
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-pill:hover {
+  background: linear-gradient(to right, #4b6cff, #5a7fff);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+
+    </style>
+</body>
+</html>
